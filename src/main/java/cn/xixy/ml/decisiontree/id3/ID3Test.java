@@ -2,11 +2,13 @@
  * @author xixy10@foxmail.com
  * @version V0.1 2017年6月2日 下午3:57:41
  */
-package cn.xixy.ml.decisiontree;
+package cn.xixy.ml.decisiontree.id3;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
+
+import cn.xixy.ml.decisiontree.Setting;
 
 /**
  *
@@ -31,7 +33,7 @@ public class ID3Test {
 		}
 		inst.buildDT("DecisionTree", "null", al, ll);
 		inst.writeXML(Setting.xmlfile);
-		
+
 		return;
 	}
 

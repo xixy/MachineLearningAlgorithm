@@ -2,7 +2,7 @@
  * @author xixy10@foxmail.com
  * @version V0.1 2017年6月1日 下午9:57:38
  */
-package cn.xixy.ml.decisiontree;
+package cn.xixy.ml.decisiontree.id3;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +20,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+
+import cn.xixy.ml.decisiontree.Setting;
 
 /**
  * 采用得到的决策树进行预测

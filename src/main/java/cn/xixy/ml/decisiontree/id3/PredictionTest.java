@@ -2,7 +2,7 @@
  * @author xixy10@foxmail.com
  * @version V0.1 2017年6月1日 下午10:03:26
  */
-package cn.xixy.ml.decisiontree;
+package cn.xixy.ml.decisiontree.id3;
 
 /**
  *

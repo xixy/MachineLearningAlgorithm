@@ -2,7 +2,7 @@
  * @author xixy10@foxmail.com
  * @version V0.1 2017年5月31日 下午7:40:41
  */
-package cn.xixy.ml.decisiontree;
+package cn.xixy.ml.decisiontree.c45;
 
 /**
  *
@@ -25,7 +25,7 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-public class ID3 {
+public class C45 {
 
 	public ArrayList<String> attribute = new ArrayList<String>(); // 存储属性的名称
 	public ArrayList<ArrayList<String>> attributevalue = new ArrayList<ArrayList<String>>(); // 存储每个属性的取值
@@ -36,7 +36,7 @@ public class ID3 {
 	Document xmldoc;
 	Element root;
 
-	public ID3() {
+	public C45() {
 		xmldoc = DocumentHelper.createDocument();
 		root = xmldoc.addElement("root");
 		root.addElement("DecisionTree").addAttribute("value", "null");
@@ -105,7 +105,12 @@ public class ID3 {
 		setDec(n);
 	}
 
-	// 给一个样本（数组中是各种情况的计数），计算它的熵
+	/**
+	 * 计算样本的熵，其中数组是同一属性值下的不同类别的数量
+	 * 
+	 * @param arr
+	 * @return
+	 */
 	public double getEntropy(int[] arr) {
 		double entropy = 0.0;
 		int sum = 0;
@@ -147,23 +152,33 @@ public class ID3 {
 		return true;
 	}
 
-	// 给定原始数据的子集(subset中存储行号),当以第index个属性为节点时计算它的信息熵
+	/**
+	 * 根据给定的原始数据中的子集，以当前第index个属性节点计算他的信息熵
+	 * 
+	 * @param subset给定原始数据的子集(subset中存储行号)
+	 * @param index
+	 *            属性index，这里是跟data排列的数据相关的
+	 * @return
+	 */
 	public double calNodeEntropy(ArrayList<Integer> subset, int index) {
 		int sum = subset.size();
 		double entropy = 0.0;
 		int[][] info = new int[attributevalue.get(index).size()][];
 		for (int i = 0; i < info.length; i++)
 			info[i] = new int[attributevalue.get(decatt).size()];
-		int[] count = new int[attributevalue.get(index).size()];
+		int[] count = new int[attributevalue.get(index).size()];// 不同属性值的计数
+		// 统计类别和属性关系
 		for (int i = 0; i < sum; i++) {
 			int n = subset.get(i);
-			String nodevalue = data.get(n)[index];
-			int nodeind = attributevalue.get(index).indexOf(nodevalue);
-			count[nodeind]++;
-			String decvalue = data.get(n)[decatt];
-			int decind = attributevalue.get(decatt).indexOf(decvalue);
-			info[nodeind][decind]++;
+			String nodevalue = data.get(n)[index];// 属性值，例如outlook是sunny
+			int nodeind = attributevalue.get(index).indexOf(nodevalue);// 属性值对应的index，例如sunny对应{sunny，rainy}中的0
+			count[nodeind]++;// 属性个数+1
+			String decvalue = data.get(n)[decatt];// 第n个数的类别
+			int decind = attributevalue.get(decatt).indexOf(decvalue);// 类别对应的index，例如yes对应{yes,no}中的0
+			info[nodeind][decind]++;// 增加相应属性值下的相应类别+1
 		}
+		// 计算
+		// |Di|/|D|*H(Di)
 		for (int i = 0; i < info.length; i++) {
 			entropy += getEntropy(info[i]) * count[i] / sum;
 		}
@@ -178,9 +193,9 @@ public class ID3 {
 	 * @param value
 	 *            顶层属性值
 	 * @param subset
-	 *            所有的需要进行判断的数据集合
+	 *            所有的需要进行判断的数据集合，这里是data这个list中的index
 	 * @param selatt
-	 *            可以选择的属性index集合
+	 *            可以选择的属性index集合，这个index是attribute这个list中的index
 	 */
 	public void buildDT(String name, String value, ArrayList<Integer> subset, LinkedList<Integer> selatt) {
 		Element ele = null;
@@ -197,7 +212,7 @@ public class ID3 {
 			ele.setText(data.get(subset.get(0))[decatt]);
 			return;
 		}
-		// 选择属性
+		// 选择熵最小的，也就是得到信息增益最大的，这里并没有计算g(D,A)，而是计算了H(D|A)，选择最小的H(D|A)，即可得到最大的g(D,A)
 		int minIndex = -1;
 		double minEntropy = Double.MAX_VALUE;
 		for (int i = 0; i < selatt.size(); i++) {
@@ -215,6 +230,7 @@ public class ID3 {
 		selatt.remove(new Integer(minIndex));
 		// 得到该属性的所有值
 		ArrayList<String> attvalues = attributevalue.get(minIndex);
+		// 按照不同属性值进行划分数据集
 		for (String val : attvalues) {
 			ele.addElement(nodeName).addAttribute("value", val);
 			ArrayList<Integer> al = new ArrayList<Integer>();
