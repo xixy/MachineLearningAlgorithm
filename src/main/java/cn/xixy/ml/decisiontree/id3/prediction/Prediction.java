@@ -21,8 +21,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import cn.xixy.ml.decisiontree.DataReader;
 import cn.xixy.ml.decisiontree.Setting;
-import cn.xixy.ml.decisiontree.id3.train.DataReader;
 import cn.xixy.ml.decisiontree.id3.train.ID3;
 
 /**

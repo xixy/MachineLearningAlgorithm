@@ -2,14 +2,14 @@
  * @author xixy10@foxmail.com
  * @version V0.1 2017年6月3日 下午1:11:54
  */
-package cn.xixy.ml.decisiontree.id3.train;
+package cn.xixy.ml.decisiontree.cart;
 
 import java.util.ArrayList;
 
 /**
- * 用于计算熵
+ * 用于计算基尼指数
  */
-class GainCalculator {
+class GiniCalculator {
 
 	/**
 	 * 判断数据集是否为同一类别的数据集
@@ -35,31 +35,35 @@ class GainCalculator {
 	 * @param arr
 	 * @return
 	 */
-	public static double getEntropy(int[] arr) {
-		double entropy = 0.0;
+	public static double getGini(int[] arr) {
+		double gini = 0.0;
 		int sum = 0;
 		for (int i = 0; i < arr.length; i++) {
-			entropy -= arr[i] * Math.log(arr[i] + Double.MIN_VALUE) / Math.log(2);
 			sum += arr[i];
 		}
-		entropy += sum * Math.log(sum + Double.MIN_VALUE) / Math.log(2);
-		entropy /= sum;
-		return entropy;
+
+		for (int i = 0; i < arr.length; i++) {
+			gini -= Math.pow(((double) arr[i] + Double.MIN_NORMAL) / ((double) sum + Double.MIN_NORMAL), 2);
+		}
+		gini += 1;
+		return gini;
 	}
 
 	/**
-	 * 根据给定的原始数据中的子集，以当前第index个属性节点计算他的信息熵
+	 * 根据给定的原始数据中的子集，以当前第index个属性节点，给出最大的基尼指数以及对应的属性值
 	 * 
 	 * @param subSet
 	 * @param attributeIndex
 	 * @param attributevalue
 	 * @return
 	 */
-	public static double calNodeEntropy(ArrayList<String[]> subSet, int attributeIndex,
+	public static Pair<Double, String> calNodeGini(ArrayList<String[]> subSet, int attributeIndex,
 			ArrayList<ArrayList<String>> attributevalue) {
+		String attribute = null;
 		int sum = subSet.size();
 		int decatt = subSet.get(0).length - 1;// 预测label的index
-		double entropy = 0.0;
+		Double minGini = Double.MAX_VALUE;
+		double gini = 0.0;
 		int[][] info = new int[attributevalue.get(attributeIndex).size()][];
 		for (int i = 0; i < info.length; i++)
 			info[i] = new int[attributevalue.get(decatt).size()];
@@ -76,9 +80,25 @@ class GainCalculator {
 		// 计算
 		// |Di|/|D|*H(Di)
 		for (int i = 0; i < info.length; i++) {
-			entropy += getEntropy(info[i]) * count[i] / sum;
+			gini = getGini(info[i]) * count[i] / sum;
+			// 构造第二个集合
+			int[] other = new int[attributevalue.get(decatt).size()];
+			for (int j = 0; j < info.length; j++) {
+				if (i != j) {
+					for (int k = 0; k < info[j].length; k++)
+						other[k] += info[j][k];
+				}
+			}
+			// |D2|/|D|*Gini(D2)
+			gini += getGini(other) * (sum - count[i]) / sum;
+
+			// 进行对比
+			if (gini < minGini) {
+				attribute = attributevalue.get(attributeIndex).get(i);
+				minGini = gini;
+			}
 		}
-		return entropy;
+		return new Pair<Double, String>(minGini, attribute);
 	}
 
 }

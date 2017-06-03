@@ -2,7 +2,7 @@
  * @author xixy10@foxmail.com
  * @version V0.1 2017年6月3日 下午12:36:40
  */
-package cn.xixy.ml.decisiontree.id3.train;
+package cn.xixy.ml.decisiontree;
 
 import java.util.ArrayList;
 import java.util.List;
