@@ -2,7 +2,7 @@
  * @author xixy10@foxmail.com
  * @version V0.1 2017年6月1日 下午9:57:38
  */
-package cn.xixy.ml.decisiontree.id3;
+package cn.xixy.ml.decisiontree.id3.prediction;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,6 +22,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import cn.xixy.ml.decisiontree.Setting;
+import cn.xixy.ml.decisiontree.id3.train.DataReader;
+import cn.xixy.ml.decisiontree.id3.train.ID3;
 
 /**
  * 采用得到的决策树进行预测
@@ -118,7 +120,7 @@ public class Prediction {
 	public void prediction() {
 		// 首先获取到属性列表
 		ID3 inst = new ID3();
-		inst.readARFF(new File(Setting.trainingfile));
+		DataReader.readARFF(new File(Setting.trainingfile), inst.attribute, inst.attributevalue, inst.data);
 		inst.setDec(inst.attribute.get(inst.attribute.size() - 1));
 		LinkedList<Integer> ll = new LinkedList<Integer>();// 非决策属性的index列表
 
