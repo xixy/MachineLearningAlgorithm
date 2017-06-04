@@ -2,7 +2,7 @@
  * @author xixy10@foxmail.com
  * @version V0.1 2017年6月1日 下午9:57:38
  */
-package cn.xixy.ml.decisiontree.id3.prediction;
+package cn.xixy.ml.decisiontree.cart.prediction;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,7 +23,7 @@ import org.dom4j.io.SAXReader;
 
 import cn.xixy.ml.decisiontree.DataReader;
 import cn.xixy.ml.decisiontree.Setting;
-import cn.xixy.ml.decisiontree.id3.train.ID3;
+import cn.xixy.ml.decisiontree.cart.Cart;
 
 /**
  * 采用得到的决策树进行预测
@@ -62,7 +62,7 @@ public class Prediction {
 	public void loadDecisionTree() {
 		SAXReader reader = new SAXReader();
 		try {
-			xmldoc = reader.read(new File(Setting.id3xmlfile));
+			xmldoc = reader.read(new File(Setting.cartxmlfile));
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}
@@ -96,6 +96,26 @@ public class Prediction {
 		int index = attributeIndex.get(name);
 		String value = attribute.getValue();
 		// 如果匹配当前节点条件，那么就以该节点为要求往下进行匹配
+		// 如果是NOT的条件
+		if (value.startsWith("Not")) {
+			String attributevalue = value.substring(4);
+			if (!attributevalue.equals(data[index])) {
+				@SuppressWarnings("unchecked")
+				Iterator<Element> it = e.elementIterator();
+				// 如果是叶子结点，那么就直接给出类别
+				if (it.hasNext() == false) {
+					return e.getText();
+				}
+				while (it.hasNext()) {
+					Element child = it.next();
+					String result = validation(child, data);
+					if (result != null)
+						return result;
+				}
+			}
+
+		}
+
 		if (value.equals(data[index])) {
 			@SuppressWarnings("unchecked")
 			Iterator<Element> it = e.elementIterator();
@@ -119,7 +139,7 @@ public class Prediction {
 	 */
 	public void prediction() {
 		// 首先获取到属性列表
-		ID3 inst = new ID3();
+		Cart inst = new Cart();
 		DataReader.readARFF(new File(Setting.trainingfile), inst.attribute, inst.attributevalue, inst.data);
 		inst.setDec(inst.attribute.get(inst.attribute.size() - 1));
 		LinkedList<Integer> ll = new LinkedList<Integer>();// 非决策属性的index列表

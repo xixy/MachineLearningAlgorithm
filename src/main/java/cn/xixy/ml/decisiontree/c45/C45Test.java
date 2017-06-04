@@ -32,7 +32,7 @@ public class C45Test {
 			al.add(i);
 		}
 		inst.buildDT("DecisionTree", "null", al, ll);
-		inst.writeXML(Setting.xmlfile);
+		inst.writeXML(Setting.c45xmlfile);
 		
 		return;
 	}

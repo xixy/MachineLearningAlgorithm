@@ -69,7 +69,7 @@ public class Cart extends DecisionTreeGenerator {
 		DecisionTree dt = inst.buildDecisionTree(inst.data, ll, inst.attributevalue, inst.attribute);
 		XmlGenerator xmlGenerator = new XmlGenerator();
 		xmlGenerator.generateXml(dt);
-		xmlGenerator.outputXmlFile(Setting.xmlfile);
+		xmlGenerator.outputXmlFile(Setting.cartxmlfile);
 		return;
 	}
 
